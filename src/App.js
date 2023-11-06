@@ -56,7 +56,7 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div>
       <h1>TODO List</h1>
       <div>
         <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="add item..."/>
