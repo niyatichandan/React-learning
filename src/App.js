@@ -1,9 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
 import { useState } from "react";
+import DeleteButton from './DeleteButton.js'
 
 function App() {
   const [todos, setTodos] = useState([]);
+  const [originalTodos, setOriginalTodos] = useState(todos);
   const [input, setInput] = useState('');
   const [editInput, setEditInput] = useState('');
   const [editIndex, setEditIndex] = useState(null);
@@ -44,10 +46,30 @@ function App() {
     const updatedTodos = todos.filter((_,i) => i !== index )
     setTodos(updatedTodos);
     setEditIndex(null);
+    console.log("Item deleted");
   };
 
-  const clearAll = () => {
+  const resetList = () => {
     setTodos([]);
+    setEditIndex(null);
+  }
+
+  const pendingTodoList = () => {
+    setOriginalTodos(todos);
+    const updatedTodos = todos.filter((todo) => todo.completed === false )
+    setTodos(updatedTodos);
+    setEditIndex(null);
+  }
+
+  const doneTodoList = () => {
+    setOriginalTodos(todos);
+    const updatedTodos = todos.filter((todo) => todo.completed === true )
+    setTodos(updatedTodos);
+    setEditIndex(null);
+  }
+
+  const clearFilter = () => {
+    setTodos(originalTodos);
     setEditIndex(null);
   }
 
@@ -68,7 +90,13 @@ function App() {
         </form>
       </div>
       <br />
-      <button onClick={clearAll} disabled={todos.length == 0 ? true : false}>Clear All</button>
+      <button onClick={resetList} disabled={todos.length === 0 ? true : false}>Reset</button>
+      <br />
+      <div>
+        <button onClick={pendingTodoList}>Pending</button>
+        <button onClick={doneTodoList}>Done</button>
+        <button onClick={clearFilter}>Clear Fliter</button>
+      </div>
       <br />
       <ul>
         {todos.map((todo, index) => (
@@ -88,7 +116,7 @@ function App() {
               </span>
             )}
             <button onClick={() => editTodo(index)}>Edit</button>
-            <button onClick={() => deleteTodo(index)}>Delete</button>
+            <DeleteButton onDelete={deleteTodo} deleteIndex={index} />
           </li>
         ))}
       </ul>
