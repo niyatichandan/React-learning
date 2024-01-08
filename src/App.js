@@ -5,7 +5,7 @@ import DeleteButton from './DeleteButton.js'
 
 function App() {
   const [todos, setTodos] = useState([]);
-  const [originalTodos, setOriginalTodos] = useState(todos);
+  const [originalTodos, setOriginalTodos] = useState([...todos]);
   const [input, setInput] = useState('');
   const [editInput, setEditInput] = useState('');
   const [editIndex, setEditIndex] = useState(null);
@@ -17,10 +17,12 @@ function App() {
         const updatedTodos = [...todos];
         updatedTodos[editIndex] = {text: editInput, isEditing: false};
         setTodos(updatedTodos);
+        setOriginalTodos(updatedTodos);
         setEditInput('');
         setEditIndex(null);
       } else{
         setTodos([...todos, { text: input, isEditing: false, completed: false }]);
+        setOriginalTodos([...todos, { text: input, isEditing: false, completed: false }]);
         setInput('');
       };
    // }
@@ -55,21 +57,19 @@ function App() {
   }
 
   const pendingTodoList = () => {
-    setOriginalTodos(todos);
-    const updatedTodos = todos.filter((todo) => todo.completed === false )
+    const updatedTodos = originalTodos.filter((todo) => todo.completed === false )
     setTodos(updatedTodos);
     setEditIndex(null);
   }
 
   const doneTodoList = () => {
-    setOriginalTodos(todos);
-    const updatedTodos = todos.filter((todo) => todo.completed === true )
+    const updatedTodos = originalTodos.filter((todo) => todo.completed === true )
     setTodos(updatedTodos);
     setEditIndex(null);
   }
 
   const clearFilter = () => {
-    setTodos(originalTodos);
+    setTodos([...originalTodos]);
     setEditIndex(null);
   }
 
