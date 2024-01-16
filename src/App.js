@@ -22,7 +22,7 @@ function App() {
       const updatedTodos = [...todos];
       if ( updatedTodos[editIndex].isDuplicate ) {
         let indexes = updatedTodos.map( (element,index) => {if(element.text === updatedTodos[editIndex].text) return index});
-        indexes.map(i => { updatedTodos[i] = {id: todos[editIndex].id, text: editInput, isEditing: false, completed: todos[editIndex].completed, completedCount: todos[editIndex].completedCount, isDuplicate: todos[editIndex].isDuplicate }} );
+        indexes.map(i => { updatedTodos[i] = {id: todos[editIndex].id, text: editInput, isEditing: false, completed: todos[editIndex].completed, completedCount: todos[editIndex].completedCount, isDuplicate: todos[editIndex].isDuplicate }});
         console.log(updatedTodos);
       }else{
         updatedTodos[editIndex] = {id: todos[editIndex].id, text: editInput, isEditing: false, completed: todos[editIndex].completed, completedCount: todos[editIndex].completedCount, isDuplicate: todos[editIndex].isDuplicate };
@@ -139,15 +139,17 @@ function App() {
 
   const getUniqueTodos = (array, key) => {
     return array.reduce((uniqueArray, currentItem) => {
-      if (!uniqueArray.find((item) => item[key] === currentItem[key])) {
+      const getValue = uniqueArray.find((item) => item[key] === currentItem[key]);
+      if (!getValue) {
         uniqueArray.push(currentItem);
+      }else {
+        let index = uniqueArray.findIndex((item) => item[key] === currentItem[key]);
+        uniqueArray[index] = currentItem;
       }
+
       return uniqueArray;
     }, []);
   };
-
-
-  //const uniqueTodos = this.getUniqueTodos(todos, 'text');
 
   return (
     <div>
