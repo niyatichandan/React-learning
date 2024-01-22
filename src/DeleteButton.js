@@ -17,7 +17,7 @@ const DeleteButton = ({ onDelete, deleteIndex }) => {
   };
 
   return (
-    <div>
+    <>
       <button onClick={handleDeleteClick}>Delete</button>
 
       {isConfirmOpen && (
@@ -27,7 +27,7 @@ const DeleteButton = ({ onDelete, deleteIndex }) => {
           <button onClick={handleCancel}>No</button>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
