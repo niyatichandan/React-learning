@@ -5,7 +5,7 @@ function App() {
 
   return (
     <div>
-      <h1>TODO List</h1>
+      <h1 className="no-select">TODO List</h1>
       <ToDoComponent />
     </div>
   );

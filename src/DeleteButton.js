@@ -18,10 +18,10 @@ const DeleteButton = ({ onDelete, deleteIndex }) => {
 
   return (
     <>
-      <button onClick={handleDeleteClick}>Delete</button>
+      <button onClick={handleDeleteClick} className="no-select">Delete</button>
 
       {isConfirmOpen && (
-        <div>
+        <div className="no-select">
           <p>Are you sure you want to delete?</p>
           <button onClick={handleConfirm}>Yes</button>
           <button onClick={handleCancel}>No</button>

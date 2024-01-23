@@ -20,7 +20,6 @@ const ToDoComponent = () => {
   const addTodo = (e) => {
     e.preventDefault();
     setError();
-    
     if ( editIndex !== null ) {
       const updatedTodos = [...todos];
       let index = updatedTodos.findLastIndex( element => {
@@ -32,22 +31,27 @@ const ToDoComponent = () => {
 
       if ( updatedTodos[editIndex].isDuplicate ) {
         if( index === -1 ){
-          updatedTodos.map( (element,index) => {
-            if(element.text === updatedTodos[editIndex].text) { 
-              updatedTodos[index] = {id: updatedTodos[index].id, text: editInput, isEditing: false, completed: updatedTodos[index].completed, completedCount: updatedTodos[index].completedCount, isDuplicate: updatedTodos[index].isDuplicate, user: updatedTodos[index].user};
+          let oldToDoText = updatedTodos[editIndex].text;
+          updatedTodos.map( (element,i) => {
+            if(element.text === oldToDoText) { 
+              updatedTodos[i] = {id: updatedTodos[i].id, text: editInput, isEditing: false, completed: updatedTodos[i].completed, completedCount: updatedTodos[i].completedCount, isDuplicate: updatedTodos[i].isDuplicate, user: updatedTodos[i].user};
             }
+            return updatedTodos;
           });
         }else{
           if ( updatedTodos[index].completed === true ) {
             let completedCount = updatedTodos[editIndex].completedCount + 1;
+            let oldToDoText = updatedTodos[editIndex].text;
             updatedTodos.map( (element,index) => {
-              if(element.text === updatedTodos[editIndex].text) { 
+              if(element.text === oldToDoText) { 
                 updatedTodos[index] = {id: updatedTodos[index].id, text: editInput, isEditing: false, completed: updatedTodos[index].completed, completedCount: completedCount, isDuplicate: updatedTodos[index].isDuplicate, user: updatedTodos[index].user};
               }
+              return updatedTodos;
             });
           }else{
             updatedTodos[editIndex] = {id: updatedTodos[editIndex].id, text: updatedTodos[editIndex].text, isEditing: false, completed: updatedTodos[editIndex].completed, completedCount: updatedTodos[editIndex].completedCount, isDuplicate: updatedTodos[editIndex].isDuplicate, user: updatedTodos[editIndex].user };
-            setError({message: 'There is already duplicate pending item in the list'});
+            if (editIndex !== index)
+              setError({message: 'There is already duplicate pending item in the list'});
           }
         }
       }else{
@@ -60,7 +64,8 @@ const ToDoComponent = () => {
             updatedTodos[editIndex] = {id: updatedTodos[editIndex].id, text: editInput, isEditing: false, completed: updatedTodos[editIndex].completed, completedCount: completedCount, isDuplicate: true, user: updatedTodos[editIndex].user };
           }else {
             updatedTodos[editIndex] = {id: updatedTodos[editIndex].id, text: updatedTodos[editIndex].text, isEditing: false, completed: updatedTodos[editIndex].completed, completedCount: updatedTodos[editIndex].completedCount, isDuplicate: updatedTodos[editIndex].isDuplicate, user: updatedTodos[editIndex].user };
-            setError({message: 'There is already duplicate pending item in the list'});
+            if (editIndex !== index)
+              setError({message: 'There is already duplicate pending item in the list'});
           }
         }
       }
@@ -121,13 +126,11 @@ const ToDoComponent = () => {
   };
 
   const deleteTodo = (id) => {
-
     let updatedTodos = [];
     let index = returnIndex(id);
     if ( todos[index].isDuplicate ) {
       setWarning();
       let duplicateElementIndexes = [];
-      debugger
       todos.map( (element,i) => {
         if(element.text === todos[index].text){ 
           duplicateElementIndexes.push(i)
@@ -150,6 +153,8 @@ const ToDoComponent = () => {
     setOriginalTodos([]);
     setEditIndex(null);
     setActive();
+    setError();
+    setWarning();
   }
 
   const pendingTodoList = (event) => {
@@ -189,16 +194,11 @@ const ToDoComponent = () => {
     return index;
   }
 
-  const getObject = (key, value) => {
-    return todos.find((item) => item[key] === value)
-  }
-
   const toggleTodo = (id) => {
     const updatedTodos = [...todos];
     let index = returnIndex(id);
     updatedTodos[index].completed = !updatedTodos[index].completed;
     setTodos(updatedTodos);
-    setEditIndex(null);
   }
 
   const handleDragEnd = (result) => {
@@ -246,7 +246,7 @@ const ToDoComponent = () => {
     <div>
       <ToDosProvider value={originalTodos}>
         <br />
-        <div>
+        <div className="no-select">
           <form onSubmit={addTodo}>
             <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="add item..."/>&nbsp;
             <input type="text" value={user} onChange={(e) => setUser(e.target.value)} placeholder="add user"/>&nbsp;
@@ -254,11 +254,11 @@ const ToDoComponent = () => {
           </form>
         </div>
         <br />
-        <div>
-          <button onClick={resetList} disabled={originalTodos.length === 0 ? true : false} >Reset TODO</button>
+        <div className="no-select">
+          <button onClick={resetList} disabled={originalTodos.length === 0 ? true : false}>Reset TODO</button>
         </div>
         <br />
-        <div>
+        <div className="no-select">
           <button key={3} className={undefined} id={"3"} onClick={clearFilter}>Clear Fliters</button>&nbsp;
           <button key={1} className={active === "1" ? "active" : undefined} id={"1"} onClick={pendingTodoList}>Pending</button>&nbsp;
           <button key={2} className={active === "2" ? "active" : undefined} id={"2"} onClick={doneTodoList}>Done</button>&nbsp;
@@ -268,7 +268,7 @@ const ToDoComponent = () => {
         </div>
         <br />
         {(error) ? 
-          <ErrorComponent errorMessage={error} />
+          <ErrorComponent errorMessage={error}/>
           : ''
         }
         {(warning) ? 
@@ -291,9 +291,11 @@ const ToDoComponent = () => {
                       >
                         {todo.isEditing ? (
                           <div>
-                            <input type="text" value={editInput} onChange={(e) => setEditInput(e.target.value)}/>&nbsp;
-                            <button onClick={addTodo}>Save</button>&nbsp;
-                            <button onClick={() => cancelTodo(todo.id)}>Cancel</button>&nbsp;
+                            <form onSubmit={addTodo}>
+                              <input type="text" value={editInput} onChange={(e) => setEditInput(e.target.value)}/>&nbsp;
+                              <button type="submit">Save</button>&nbsp;
+                              <button type="button" onClick={() => cancelTodo(todo.id)}>Cancel</button>&nbsp;
+                            </form>
                           </div>
                         ) : todo.isDuplicate ? (
                             <span
@@ -311,8 +313,8 @@ const ToDoComponent = () => {
                               {todo.text} &nbsp;&nbsp;&nbsp;&nbsp;
                             </span>
                         )}
-                        <button onClick={() => editTodo(todo.id)}>Edit</button> &nbsp;
-                        <DeleteButton onDelete={deleteTodo} deleteIndex={todo.id} />
+                        <button onClick={() => editTodo(todo.id)} className="no-select">Edit</button> &nbsp;
+                        <DeleteButton onDelete={deleteTodo} deleteIndex={todo.id}/>
                       </li>
                     )}
                   </Draggable>
